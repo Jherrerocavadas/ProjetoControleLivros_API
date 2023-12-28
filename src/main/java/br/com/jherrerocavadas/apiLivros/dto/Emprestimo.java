@@ -34,17 +34,17 @@ public class Emprestimo {
     @Column(insertable=true, updatable=true)
     private Long pessoaId;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "pessoaId", referencedColumnName = "pessoaId",
-            insertable=false, updatable=false, foreignKey = @ForeignKey(name = "UK_EMPRESTIMO_PESSOA"))
+            insertable=false, updatable=false, foreignKey = @ForeignKey(name = "UK_EMPRESTIMO_PESSOA", value = ConstraintMode.CONSTRAINT))
     private Pessoa pessoa;
 
     @Column(insertable=true, updatable=true)
     private Long livroId;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "livroId", referencedColumnName = "livroId",
-            insertable=false, updatable=false, foreignKey = @ForeignKey(name = "UK_EMPRESTIMO_LIVRO"))
+            insertable=false, updatable=false, foreignKey = @ForeignKey(name = "UK_EMPRESTIMO_LIVRO", value = ConstraintMode.CONSTRAINT))
     private Livro livro;
 
 
