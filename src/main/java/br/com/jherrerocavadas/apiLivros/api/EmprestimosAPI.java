@@ -23,16 +23,11 @@ import java.util.Objects;
 //@RequestMapping("/api/v1/emprestimos")
 public class EmprestimosAPI {
     private EmprestimoRepository emprestimoRepository;
-    private LivroRepository livroRepository;
-    private PessoaRepository pessoaRepository;
 
     @Autowired
-    private EmprestimosAPI(EmprestimoRepository emprestimoRepository,
-                           LivroRepository livroRepository,
-                           PessoaRepository pessoaRepository){
+    private EmprestimosAPI(EmprestimoRepository emprestimoRepository){
         this.emprestimoRepository = emprestimoRepository;
-        this.livroRepository = livroRepository;
-        this.pessoaRepository = pessoaRepository;
+
     }
 
     @Operation(summary =  "Verificar o serviço de empréstimos de livro")
@@ -94,62 +89,6 @@ public class EmprestimosAPI {
         }
     }
 
-    @Operation(summary =  "Retornar empréstimo de acordo com os filtros")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Empréstimos retornados de acordo com os filtros configurados"),
-            @ApiResponse(responseCode = "400", description = "Requisição inválida"),
-            @ApiResponse(responseCode = "403", description = "Você não tem permissão para acessar este recurso"),
-            @ApiResponse(responseCode = "500", description = "Foi gerada uma exceção"),
-    })
-    @GetMapping("/emprestimos/search")
-    public ResponseEntity<List<Emprestimo>> retornarEmprestimosPorFiltro(@RequestParam (value = "titulo", required = false) String titulo,
-                                               @RequestParam (value = "pessoa", required = false) String pessoa,
-
-                                               @RequestParam (value = "data", required = false) String data){
-       List<Emprestimo> emprestimos;
-
-       //Normalizar filtros
-        if(titulo == null){
-            titulo = "";
-        }
-        if(pessoa == null){
-            pessoa = "";
-        }
-
-        if(data == null){
-            data = "";
-        }
-
-        Long livroId = livroRepository.getLivrosByTitulo(titulo).get(0).getLivroId();
-
-        Long pessoaId = pessoaRepository.getPessoaByNome(pessoa).get(0).getPessoaId();
-
-        LocalDate.parse(data, DateTimeFormatter.ISO_DATE);
-
-        //Acionar consultas diferentes de acordo com os filtros
-        if((titulo != "" && pessoa == "")){
-            emprestimos = emprestimoRepository.getEmprestimoByDataEmprestimo(LocalDate.parse(data, DateTimeFormatter.ISO_DATE));
-//            emprestimos = emprestimoRepository.getEmprestimoByLivroId(livroId);
-        } else if ((titulo == "" && pessoa != "")) {
-//            emprestimos = emprestimoRepository.getEmprestimoByPessoaId(pessoaId);
-            emprestimos = emprestimoRepository.getEmprestimoByDataEmprestimo(LocalDate.parse(data, DateTimeFormatter.ISO_DATE));
-        } else if ((data != "")) {
-            emprestimos = emprestimoRepository.getEmprestimoByDataEmprestimo(LocalDate.parse(data, DateTimeFormatter.ISO_DATE));
-        } else{
-            emprestimos = (List<Emprestimo>) emprestimoRepository.findAll();
-        }
-
-
-        if(Objects.nonNull(emprestimos) || !emprestimos.isEmpty()){
-            return ResponseEntity.ok(emprestimos);
-        }
-        else{
-            return ResponseEntity.notFound().build();
-        }
-
-    }
-
-
     @Operation(summary =  "Cadastrar um novo empréstimo")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Empréstimo salvo"),
@@ -185,7 +124,7 @@ public class EmprestimosAPI {
     })
     @DeleteMapping("/emprestimos/{id}")
     public void removerEmprestimo(@PathVariable long id){
-        livroRepository.deleteById(id);
+        emprestimoRepository.deleteById(id);
     }
 
 
